@@ -3,7 +3,7 @@
  * Plugin Name: Hashtag Formatter
  * Plugin URI: https://devapps.uk
  * Description: Converts a comma-separated list of tags into formatted hashtags for social media.
- * Version: 0.0.9-dev
+ * Version: 0.0.10-dev
  * Author: Tamjid Bhuiyan
  * Author URI: https://devapps.uk
  */
@@ -70,16 +70,16 @@ function format_hashtags($tags) {
 
     foreach ($tagsArray as $tag) {
         $cleanTag = preg_replace('/\s+/', '', $tag); // Remove all spaces
-        $cleanTag = preg_replace('/[^a-zA-Z0-9\$\#]/', '', $cleanTag); //Remove special characters except # $
+        $cleanTag = preg_replace('/[^a-zA-Z0-9\$\#]/', '', $cleanTag); // Remove special characters except # $
         $cleanTag = strtolower($cleanTag); // Convert to lowercase
         if (!empty($cleanTag)) { // Check if the tag is not empty after cleaning
             $hashtags[] = '#' . $cleanTag;
         }
     }
 
-    return implode(' ', $hashtags); // Join the array elements with spaces
+    $result = implode(' ', array_slice($hashtags, 0, 5)); // Join the first 5 hashtags with spaces
+    return trim($result, '"'); // Remove surrounding double quotes, if any
 }
-
 
 function hashtag_formatter_api() {
     register_rest_route('hashtag-formatter/v1', '/convert/', array(
