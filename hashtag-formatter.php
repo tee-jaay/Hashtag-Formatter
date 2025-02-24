@@ -41,7 +41,10 @@ function hashtag_formatter_settings_page() {
 
 function hashtag_formatter_settings_init() {
     add_option('hashtag_formatter_security_key', '');
+    add_option('hashtag_formatter_hashtag_count', 5); // Default value for the number of hashtags
+
     register_setting('hashtag_formatter_options', 'hashtag_formatter_security_key', 'sanitize_text_field');
+    register_setting('hashtag_formatter_options', 'hashtag_formatter_hashtag_count', 'intval'); // Sanitize as integer
 
     add_settings_section(
         'hashtag_formatter_section',
@@ -57,11 +60,23 @@ function hashtag_formatter_settings_init() {
         'hashtag-formatter',
         'hashtag_formatter_section'
     );
+
+    add_settings_field(
+        'hashtag_formatter_hashtag_count',
+        'Number of Hashtags',
+        'hashtag_formatter_hashtag_count_callback',
+        'hashtag-formatter',
+        'hashtag_formatter_section'
+    );
 }
 add_action('admin_init', 'hashtag_formatter_settings_init');
 
 function hashtag_formatter_security_key_callback() {
     echo '<input type="text" name="hashtag_formatter_security_key" value="' . esc_attr(get_option('hashtag_formatter_security_key')) . '" class="regular-text">';
+}
+
+function hashtag_formatter_hashtag_count_callback() {
+    echo '<input type="number" name="hashtag_formatter_hashtag_count" value="' . esc_attr(get_option('hashtag_formatter_hashtag_count', 5)) . '" class="small-text" min="1">';
 }
 
 function format_hashtags($tags) {
@@ -77,7 +92,9 @@ function format_hashtags($tags) {
         }
     }
 
-    $result = implode(' ', array_slice($hashtags, 0, 5)); // Join the first 5 hashtags with spaces
+    // Get the number of hashtags to join from settings, default to 5 if not set
+    $hashtag_count = get_option('hashtag_formatter_hashtag_count', 5);
+    $result = implode(' ', array_slice($hashtags, 0, $hashtag_count)); // Join the first N hashtags with spaces
     return trim($result, '"'); // Remove surrounding double quotes, if any
 }
 
